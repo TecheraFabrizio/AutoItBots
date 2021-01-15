@@ -1,0 +1,181 @@
+#include <GUIConstantsEx.au3>
+#include <StaticConstants.au3>
+#include <WindowsConstants.au3>
+#include <AutoItConstants.au3>
+#include <EditConstants.au3>
+#include <ProgressConstants.au3>
+
+;*******************INTERFAZ GRAFICA***********
+
+#Region ### START Koda GUI section ### Form=
+$Form1 = GUICreate("Piano Tiles 2 BOT", 615, 414, 183, 151)
+GUISetBkColor(0xC0DCC0)
+$Progress1 = GUICtrlCreateProgress(48, 280, 502, 33)
+GUICtrlSetColor(-1, 0xFF0000)
+$Label1 = GUICtrlCreateLabel("S PARA EMPEZAR", 40, 24, 223, 33)
+GUICtrlSetFont(-1, 18, 800, 0, "MS Sans Serif")
+GUICtrlSetBkColor(-1, 0xFFFF00)
+$Label2 = GUICtrlCreateLabel("Q PARA SALIR", 40, 72, 144, 28)
+GUICtrlSetFont(-1, 14, 800, 0, "MS Sans Serif")
+GUICtrlSetBkColor(-1, 0xFFFF00)
+$Input1 = GUICtrlCreateInput("0", 72, 128, 89, 21)
+$Input2 = GUICtrlCreateInput("0", 240, 128, 89, 21)
+$Input3 = GUICtrlCreateInput("0", 72, 176, 89, 21)
+$Input4 = GUICtrlCreateInput("0", 240, 176, 89, 21)
+$Label3 = GUICtrlCreateLabel("X1", 40, 128, 24, 23)
+GUICtrlSetFont(-1, 12, 800, 0, "Arial")
+$Label4 = GUICtrlCreateLabel("Y1", 208, 136, 23, 23)
+GUICtrlSetFont(-1, 12, 800, 0, "Arial")
+GUICtrlSetColor(-1, 0x000000)
+$Label5 = GUICtrlCreateLabel("X2", 40, 176, 24, 23)
+GUICtrlSetFont(-1, 12, 800, 0, "Arial")
+GUICtrlSetColor(-1, 0x000000)
+$Label6 = GUICtrlCreateLabel("Y2", 208, 176, 23, 23)
+GUICtrlSetFont(-1, 12, 800, 0, "Arial")
+GUICtrlSetColor(-1, 0x000000)
+$Label7 = GUICtrlCreateLabel("TIEMPO INACTIVO", 48, 232, 230, 33)
+GUICtrlSetFont(-1, 18, 800, 0, "MS Sans Serif")
+$Label8 = GUICtrlCreateLabel("ESTADO:", 408, 96, 146, 41)
+GUICtrlSetFont(-1, 24, 800, 0, "Arial")
+GUICtrlSetBkColor(-1, 0xBFCDDB)
+$Label9 = GUICtrlCreateLabel("OFF", 408, 152, 70, 45)
+GUICtrlSetFont(-1, 28, 800, 0, "Courier New")
+$Label10 = GUICtrlCreateLabel("Mouse_X:", 24, 344, 98, 26)
+GUICtrlSetFont(-1, 14, 800, 0, "Arial")
+GUICtrlSetColor(-1, 0x008000)
+GUICtrlSetBkColor(-1, 0x00FF00)
+$Label11 = GUICtrlCreateLabel("0", 152, 344, 50, 26)
+GUICtrlSetFont(-1, 14, 800, 0, "Arial")
+GUICtrlSetColor(-1, 0x008000)
+GUICtrlSetBkColor(-1, 0xBFCDDB)
+$Label12 = GUICtrlCreateLabel("Mouse_Y:", 24, 376, 98, 26)
+GUICtrlSetFont(-1, 14, 800, 0, "Arial")
+GUICtrlSetColor(-1, 0x008000)
+GUICtrlSetBkColor(-1, 0x00FF00)
+$Label13 = GUICtrlCreateLabel("0", 152, 376, 50, 26)
+GUICtrlSetFont(-1, 14, 800, 0, "Arial")
+GUICtrlSetColor(-1, 0x008000)
+GUICtrlSetBkColor(-1, 0xBFCDDB)
+GUISetState(@SW_SHOW)
+#EndRegion ### END Koda GUI section ###
+
+;Tecla para activar bot
+HotKeySet("{s}", "activar")
+HotKeySet("{q}", "salir")
+
+
+;Si existen teclas que se ejecute sino que se detenga
+Global $teclas = false
+Local $hTimer = 0
+Local $fDiff = 0
+
+;indicamos que existe alguna tecla para hacer clic en pantalla y establecemos un timer
+;El timer se va a usar para detener el bot si no encuentra mas teclas en un tiempo determinado.
+func activar()
+	$teclas = True
+
+	; Iniciamos el timer
+	$hTimer = TimerInit()
+	GUICtrlSetData($Label9, "ON")
+	;Siempre y cuando sea cierto que teclas = true buscamos teclas
+	While $teclas
+		buscar()
+	WEnd
+
+EndFunc
+
+
+;Funcion principal para buscar teclas segun el tipo
+;Tecla comenzar
+;Tecla negra (la que mas vamos a hacerle clic)
+;Tecla bonus (la tecla que sale cuando completamos los tres niveles basicos)
+
+func buscar()
+
+
+Sleep(20)
+
+Local $left = GUICtrlread($input1)
+Local $top = GUICtrlread($input2)
+Local $right = GUICtrlread($input3)
+Local $bottom = GUICtrlread($input4)
+
+
+;buscamos tecla comenzar
+Local $a = PixelSearch ($left, $top, $right, $bottom, 0x319EC6 , 1 ,1)
+;Si encuentra la tecla entonces...
+If Not @error Then
+	MouseMove($a[0]+20, $a[1], 1)
+    ;clic izquierdo, x, y, numero de clics, velocidad
+;~ 	MouseClick("left", $a[0]+10, $a[1], 1,2)
+	MouseDown($MOUSE_CLICK_LEFT)
+	$fDiff = 0
+	$hTimer = TimerInit()
+	GUICtrlSetData($Progress1,0)
+EndIf
+
+;buscamos tecla negra
+Local $b = PixelSearch ($left, $top, $right, $bottom, 0x000001 , 1 ,1)
+If Not @error Then
+	MouseUp($MOUSE_CLICK_LEFT)
+	MouseMove($b[0]+20, $b[1], 1)
+    ;clic izquierdo, x, y, numero de clics, velocidad
+;~ 	MouseClick("left", $b[0]+10, $b[1], 1,2)
+	MouseDown($MOUSE_CLICK_LEFT)
+	$fDiff = 0
+	$hTimer = TimerInit()
+	GUICtrlSetData($Progress1,0)
+EndIf
+
+;buscamos tecla bonus
+Local $c = PixelSearch ($left, $top, $right, $bottom, 0xFFB503 , 1 ,1)
+If Not @error Then
+	MouseMove($c[0]+20, $c[1], 1)
+    ;clic izquierdo, x, y, numero de clics, velocidad
+;~ 	MouseClick("left", $c[0]+10, $c[1], 1,2)
+	MouseDown($MOUSE_CLICK_LEFT)
+	$fDiff = 0
+	$hTimer = TimerInit()
+	GUICtrlSetData($Progress1,0)
+EndIf
+
+; Buscamos la diferencia de tiempo
+$fDiff = TimerDiff($hTimer)
+
+;~ ;Si el tiempo transcurrido es de 20 frenamos el bot desactivando teclas
+;~ ;Es decir si no hay mas teclas en pantalla detenemos el bot.
+if guictrlread($Progress1) = 100 Then
+	$teclas = False
+	$fDiff = 0
+	GUICtrlSetData($Label9, "OFF")
+EndIf
+
+
+GUICtrlSetData($Progress1,$fDiff/100)
+
+EndFunc
+
+
+
+While 1
+
+	$nMsg = GUIGetMsg()
+	Switch $nMsg
+		Case $GUI_EVENT_CLOSE
+			Exit
+
+	EndSwitch
+
+
+	GUICtrlSetData($label11, MouseGetPos(0))
+	GUICtrlSetData($label13, MouseGetPos(1))
+
+
+WEnd
+
+
+
+func salir()
+	GUICtrlSetData($Label9, "OFF")
+	$teclas = false
+EndFunc

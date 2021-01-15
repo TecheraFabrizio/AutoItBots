@@ -1,0 +1,84 @@
+ 
+Local $colorHex = ""
+ 
+Local $reg1 = [333, 591]
+Local $reg2 = [839, 616]
+ 
+Local $posBuscada = []
+ 
+Local $pos = []
+ 
+;obtener region rectangular
+;seleccionar color a buscar
+ 
+HotKeySet("{1}", "obtenerPos")
+HotKeySet("{2}", "obtenerColor")
+HotKeySet("{4}", "comenzar")
+HotKeySet("{q}", "quitar")
+ 
+ 
+    Func primerRegion()
+ 
+        $reg1[1] = 591
+    EndFunc
+ 
+    Func segundaRegion()
+ 
+        $reg2[1] = 616
+    EndFunc
+ 
+ 
+ 
+func quitar()
+    exit
+EndFunc
+ 
+Func obtenerPos()
+    $pos = MouseGetPos()
+EndFunc
+ 
+    Func obtenerColor()
+        ToolTip("Obteniendo color")
+ 
+        ;Obtener color con coordenadas
+        Local $color = PixelGetColor($pos[0], $pos[1])
+ 
+        $colorHex =  Hex($color, 6)
+        ConsoleWrite($colorHex & @CRLF)
+ 
+    EndFunc
+
+
+Func comenzar()
+        obtenerColor()
+ 
+        primerRegion()
+        segundaRegion()
+ 
+        while 1
+            ConsoleWrite($reg1[0] & " " & $reg1[1] & " " & $reg2[0] & " " & $reg2[1])
+            $posBuscada = pixelSearch($reg1[0], $reg1[1], $reg2[0], $reg2[1], "0x" & $colorHex, 10)
+ 
+            IF not @error then
+                ;ConsoleWrite("X: " & $posBuscada[0] & ", Y:" & $posBuscada[1])
+                MouseMove($posBuscada[0], $posBuscada[1], 1)
+                sleep(1000)
+                MouseClick("left")
+ 
+                ExitLoop
+            Else
+                $reg1[1] -= 32
+                $reg2[1] -= 32
+            Endif
+ 
+        WEnd
+        obtenerColor()
+        sleep(1000)
+        comenzar()
+ 
+EndFunc
+ 
+
+while 1
+
+WEnd
